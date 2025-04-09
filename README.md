@@ -23,11 +23,17 @@
  10. [JavaScript 기본 : 구조 분해 할당](#javascript-기본--구조-분해-할당)
  11. [JavaScript 기본 : 배열](#javascript-기본--배열)
  12. [JavaScript 기본 : 함수](#javascript-기본--함수)  
-    12-1. [Closure 함수](#closure-함수)
- 13. [JavaScript 객체](#javascript-객체)
+    12-1. [Closure 함수](#closure-함수)  
+    12-2. [함수 내부에서의 this](#함수-내부에서의-this)
+ 13. [JavaScript 객체](#javascript-객체)  
+    13-1. [JavaScript의 AccessModifier](#javascript의-accessmodifier)
+ 14. [JavaScript 내장 객체](#javascript-내장-객체)  
+    14-1. [JSON의 내장 객체 stringify(직렬화)/parse(역직렬화) (+브라우저 storage/DOM API)](#json의-내장-객체-stringify직렬화parse역직렬화-브라우저-storagedom-api)
+ 15. [JavaScript 이벤트 제어](#javascript-이벤트-제어)
  97. [기타 - JS load 이벤트](#기타---js-load-이벤트)
  98. [기타 - Node.js에서 입/출력 하기](#기타---nodejs에서-입출력-하기)
  99. [기타 - 참고 사이트](#기타---참고-사이트)
+ 99. [기타 - 개발 TOOL](#기타---개발-tool)
 
 
 ## JavaScript의 등장
@@ -676,8 +682,8 @@ body {
          // value와 타입을 함께 비교 (일치연산자)
          
          /* 숫자로 구성된 문자열을 number로 형변환하는 방법 2가지.
-          * 방법1) Number() 객체 활용.
-          * 방법2) parseInt() 객체 활용. */
+          * 방법1) Number() 전역 객체 활용.
+          * 방법2) parseInt() 전역 객체 활용. */
         console.log(Number("123seoul")); // NaN
          // NaN(Not a Number)로 Number로 형변환 불가하다는 의미다.
          // Number()는 문자열 전체가 숫자일 경우에만 형변환이 가능하다. 
@@ -1038,7 +1044,7 @@ body {
         }
 
         caller(callee); // callee는 콜백 함수가 됨.
-        caller((m) => console.log(`I'm function: ${m}`)); // 위 콜백 함수로 처리한것과 동일함.
+        caller((m) => console.log(`I'm function: ${m}`)); // 이것 또한 콜백 함수이다.
     </script>
 
     내부 함수는 내부 함수가 정의된 (enclosing 함수)의 내부에서만 호출 할 수 있다. <br>
@@ -1154,11 +1160,80 @@ body {
 </body>
 ```
 
+### 함수 내부에서의 this
+```html
+<body>
+    각 함수별로 this는 누구를 지칭하는가? <br>
+    - 선언적 함수에서의 this : window 객체(전역 영역(window Scope)에 구성되었기 때문에) <br>
+    - 익명 함수에서의 this : window 객체(전역 영역(window Scope)에 구성되었기 때문에) <br>
+    - 화살표 함수에서의 this : window 객체(전역 영역(window Scope)에 구성되었기 때문에) <br>
+    - 생성자 함수에서의 this : new로 생성된 인스턴스 자신이나, Prototype Object로부터 만들어졌기 때문에 Object로 출력됨 <br>
+    - 파라미터로 전달된 함수(콜백함수)에서의 this : window(f3이 window에 포함되어 있기 때문에 일반 함수와 동일) <br>
+    - 내부 함수에서의 this : window 객체(inner는 f5의 소속되어 있으나, f5는 window에 소속되어 있기 때문에) <br>
+    - 이벤트 핸들러 함수 내부에서의 this : HTMLButtonElement 객체(즉, 이벤트가 발생된 소스 객체를 참조한다.) <br>
+
+    <br>
+    여담 - 선언적 함수와 생성자 함수는 비슷한 형태나 작성 규칙이나 내용이 다르다 <br>
+    선언적 함수 작성 규칙 : 소문자로 시작하는 명칭 <br>
+    생성자 함수 작성 규칙 : 대문자로 시작하는 명칭 <br>
+    선언적 함수 내용 : 기능 <br>
+    생성자 함수 내용 : 기능이 아닌 객체를 만드는 내용 <br>
+    * 결론적으로 옛날 문법은 애매한 부분이 많아 class 문법의 도입이 되었다. <br><br>
+    <script>
+        function f() {
+            document.write("선언적 함수에서 this : " + this + "<br>")
+        }
+        f();
+
+        let f2 = function() {
+            document.write("익명 함수에서 this : " + this + "<br>")
+        }
+        f2();
+
+        (() => {
+            document.write("화살표 함수에서 this : " + this + "<br>")
+        })();
+
+        function User() {
+            document.write("생성자 함수에서 this : " + this + "<br>")
+        }
+        new User();
+
+        function f3(callback){
+            callee();
+        }     
+        function callee() {
+            document.write("파라미터로 전달된 함수(콜백함수)에서 this : " + this + "<br>");
+        }
+        f3(callee);
+
+        function f5() {
+            let inner = () => {
+                document.write("내부 함수에서 this : " + this + "<br>")
+            }
+            inner();
+        }
+        f5();
+    </script>
+    <button id="btn">클릭</button>
+    <script>
+        document.getElementById("btn").onclick = function() {
+            document.write("이벤트 핸들러 함수 내부에서 this : " + this + "<br>")
+        }
+    </script>
+    이벤트 발생 후, document.write()를 호출하면 렌더링 결과가 변경되면서 HTML 페이지의 내용이 지워지고 새로 기록된다 <br>
+    위와 같은 동작으로 인해 document.write()는 디버깅이나 테스트용 코드에서만 사용을 권장. (서비스 Application에서 사용 x)
+</body>
+```
+
 
 ## JavaScript 객체
  - 객체 구조의 참고사항
-    - [[Prototype]] 은 해당 객체가 누구로부터 만들어졌냐이다.
-    - Prototype 은 해당 객체가 누구로부터 상속 받았냐이다.
+    - [[Prototype]] 은 해당 객체가 누구로(상속)부터 만들어졌냐이다.
+    - Prototype 은 상속받은 객체의 속성 정보들이 존재한다.
+ - 객체에서의 null
+    - 객체에서 null은 **값이 할당되지 않음** 을 말한다.
+    - 이것은 곧 쓰지 않은 객체이니 Garbage Collector에게 처리하도록 얘기하는 것과 같다.
 ```html
 <body>
     JavaScript는 Prototype 기반의 언어라고 한다. <br>
@@ -1179,8 +1254,9 @@ body {
     - 단점 : 동일한 구조의 객체를 여러 번 생성하려면 매번 수작업으로 정의해야 한다. (인스턴스를 생성할 수 있는 틀이 없다, 재사용성이 떨어진다.) <br>
     - 단점 : [[Prototype]] 기반의 상속이나 메서드 재사용 등의 고급 기능을 사용하지 못한다. <br>
     즉, JSON은 정적인 데이터 표현만을 위해서 사용한다. (사용 목적이 이것밖에 없다.) <br>
-    기타 특징으로는 JSON 객체는 동적으로 요소 추가, 삭제 가능하다. <br>
-    기타 특징으로는 JSON 문법으로 생성한 객체는 Object을 Prototype으로 하는 인스턴스 이다. <br>
+    기타 특징으로 JSON 객체는 동적으로 요소 추가, 삭제 가능하다. <br>
+    기타 특징으로 JSON 문법으로 생성한 객체는 Object을 Prototype으로 하는 인스턴스 이다. <br>
+    기타 특징으로 JSON 객체는 생성하자마다 단, 하나의 인스턴스만 생성된다.(단점과 이어진다.) <br>
     <script>
     let student = { name: 'kim', kor: 90, math: 90, eng: 85 };
     console.log(student.name);
@@ -1281,7 +1357,6 @@ body {
     console.log(park instanceof SubStudent); // true
 
     function SubStudent2(name, kor, math, eng, grade) {
-        // Student(name, kor, math, eng); // 얜 안되나
         Student.apply(this, [name, kor, math, eng]);
             // 각 변수를 받아 this에 바로 전달해준다. (Student라는 생성자 함수를 즉시 호출한다.)
         this.grade = grade
@@ -1307,13 +1382,13 @@ body {
     - 그 외, 객체 관련 특징은 함수문법을 사용한것과 동일하다. <br>
     <script>
         class StudentNew {
-            constructor (name, kor, math, eng) {
+            constructor (name, kor, math, eng) { // 생성자 메서드
                 this.name = name;
                 this.kor = kor;
                 this.math = math;
                 this.eng = eng;
             }
-            total() {
+            total() { // 기능 구현 메서드
                 return this.kor + this.math + this.eng;
             }
             pass() {
@@ -1382,12 +1457,508 @@ body {
 </body>
 ```
 
+### JavaScript의 AccessModifier
+```html
+<body>
+    객체 지향 프로그래밍(OOP) 객체는 속성을 private로 선언하고, getter/setter은 외부에서 Access 할 수 있도록 public으로 정의한다. <br>
+    단, JavaScript는 Java 처럼 AccessModifier가 정교하지 않다. <br>
+    <script>
+        class Person {
+            #name; // #은 private 선언을 의미
+            #age;
+            constructor(name, age) {
+                this.#name = name;
+                this.#age = age;
+            }
+            setName(name) {
+                this.#name = name || 'unknown'; // name이 false 조건일 경우에 대한 기본값 설정
+            }
+            getName(name) {
+                return this.#name;
+            }
+            toString() { // Object의 toString() Override
+                return `Name : ${this.#name}`;    
+            }
+        }
+        const p = new Person('A', 500);
+        console.log(p.name); // undefined (#은 private를 의미하긴 하지만, 변수명은 #name 이다.)
+        // console.log(p.#name); // Private Field Error
 
-## 
+        console.log(p.getName()); // A
+        p.setName('test');
+        console.log(p.getName()); // test
+        p.setName(null);
+        console.log(p.getName()); // unknown
+        console.log(p.toString()); // Name : unknown
+
+        console.dir(p);
+    </script>
+</body>
+```
+
+
+## JavaScript 내장 객체
+```html
+<body>
+    JavaScript의 여러가지 내장 객체들 사용해보기 <br>
+    <script>
+        let text = 'Hello World!';
+        let result = text.anchor("Chapter 10"); // HTML의 a 태그로 만들어줌.
+        console.log(result); // <a name="Chapter 10">Hello World!</a>
+        
+        let result1 = text.bold(); // HTML의 b 태그로 만듦.
+        console.log(result1); // <b>Hello World!</b>
+        document.write(result1);
+
+
+        /* slice(start, end) : 원본 배열 또는 문자열을 변경하지 않고, 새로운 객체를 반환 */
+        let result2 = text.slice(6, 12); // 6번째 자리부터 12번째 이전까지 추출
+        console.log(text); // Hello World!
+        console.log(result2); // World!
+
+        let result3 = text.slice(-6, 12); // 음수로 지정할 경우 문자열을 오른쪽이 아닌 왼쪽 방향으로 읽음.
+        console.log(text); // Hello World!
+        console.log(result3); // World!
+
+        let result4 = text.slice(-6); // end가 지정되지 않은 경우에는 문자열 끝까지
+        console.log(text); // Hello World!
+        console.log(result4); // World!
+
+
+        /* substring(start, end) : 문자열에서만 사용, 음수 인덱스는 허용하지 않음, start > end 이면 자동으로 바꿔서 처리해줌.*/
+        let re = text.substring(-6);
+        console.log(re); // Hello World! (음수 적용이 안되어 전체 문자열 출력)
+        
+        re = text.substring(6, 12);
+        console.log(re); // World!
+
+
+        /* split(sperator, limit) : sperator로 tokenize해서 배열로 리턴 */
+        let text2 = '사과-배-바나나-딸기-복숭아-귤';
+        let fruits = text2.split('-', 4);
+        console.log(fruits); // ['사과', '배', '바나나', '딸기']
+        console.dir(fruits); // Array
+    </script>
+
+    Q> 버튼을 누를때마다 로또 번호 추출하기 <br>
+    <button id="lotto">번호 추첨</button>
+    <script>
+        document.getElementById("lotto").onclick = function() {
+            let lottos = []
+
+            while(lottos.length < 6) { // 로또 번호 6개 추첨
+                let num = Math.trunc(Math.random()*45+1); // 1이상 45이하의 난수 생성(Math.random() : 0~1 사이의 난수 생성)
+                if(!lottos.includes(num)) {
+                    lottos.push(num);
+                }
+            }
+            lottos.sort((a, b) => a-b);
+            document.write(lottos.join(", ") + ' ');
+        }
+    </script>
+</body>
+```
+
+### JSON의 내장 객체 stringify(직렬화)/parse(역직렬화) (+브라우저 storage/DOM API)
+ - 직렬화 : JavaScript 객체 > JSON 형식의 문자
+ - 역직렬화 : JSON 형식의 문자 > JavaScript 객체
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 객체를 직렬화/역직렬화 해보기</title>
+    <script>
+        /* JSON 객체를 직렬화/역직렬화 해보기(브라우저의 storage 활용.) */
+        let todos = [];
+        window.onload = function() {
+            const stored = sessionStorage.getItem("todos")
+            if(stored) {
+                todos = JSON.parse(stored); // 역직렬화 (JSON 형식의 문자 > JavaScript 객체)
+                renderTodos()
+            }
+        }
+
+        function renderTodos() {
+            const ulEl = document.getElementById("todoList")
+            ulEl.innerHTML=""; // HTML 내용 초기화
+            todos.forEach(todo => {
+                const liEl = document.createElement("li") // li 태그 생성
+                liEl.textContent = todo.text // li 태그에 text 입력
+
+                const editBtnEl = document.createElement("button") // button 태그 생성
+                editBtnEl.textContent = "수정" // button 라벨 지정
+                editBtnEl.onclick = () => { editTodo(todo.id) }
+
+                const delBtnEl = document.createElement("button")
+                delBtnEl.textContent = "삭제"
+                delBtnEl.onclick = () => { delTodo(todo.id) }
+
+                liEl.appendChild(editBtnEl) // li 태그에 button 태그를 자식으로 추가
+                liEl.appendChild(delBtnEl)
+                ulEl.appendChild(liEl) // ul 태그에 li 태그를 자식으로 추가
+            })
+        }
+
+        function addTodo() {
+            const inputEl = document.getElementById("todoInput")
+            const txt = inputEl.value.trim() // 공백 제거
+            if(txt === "") return // 입력 값 없으면 retrun
+
+            todos.push({
+                id: Date.now(),
+                text: txt
+            })
+            inputEl.value="" // 값 초기화
+
+            saveAndRender()
+        }
+
+        function saveAndRender() {
+            sessionStorage.setItem("todos", JSON.stringify(todos)) // 직렬화 (JavaScript 객체 > JSON 형식의 문자)
+            renderTodos();
+        }
+
+        function editTodo(id) {
+            const newText = prompt("수정할 내용을 입력하세요") // 새로 입력받기
+            if(newText === null) return
+            
+            const todo = todos.find(t => t.id == id) // find는 배열에서 데이터를 찾으면 루프 중단
+            if(todo) {
+                todo.text = newText
+                saveAndRender()
+            }
+        }
+
+        function delTodo(id) {
+            todos = todos.filter(t => t.id != id) // 매개변수와 동일한 id만 todos 에 저장
+            saveAndRender()
+        }
+    </script>
+</head>
+<body>
+    <h2>Todo List</h2>
+    <input type="text" id="todoInput" placeholder="해야할 일 입력">
+    <button onclick="addTodo()">추가</button>
+    <ul id="todoList"></ul>
+</body>
+```
+
+
+## JavaScript 이벤트 제어
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 이벤트 제어</title>
+    <script>
+        /* DOM Level 0 방식
+        window.onload = function() {
+            console.log("window 객체의 load 이벤트 핸들러1")
+        }
+
+        window.onload = function() {
+            console.log("window 객체의 load 이벤트 핸들러2")
+        }
+
+        window.onload = function() {
+            console.log("window 객체의 load 이벤트 핸들러3")
+        } // 마지막 데이터만 출력(=하나의 이벤트에 대해서 하나의 이벤트 핸들러만 등록 가능)
+        */
+
+        /* DOM Level 2 방식
+        window.addEventListener("load", function() {
+            console.log("window 객체의 load 이벤트 핸들러1")
+        }, false)
+
+        window.addEventListener("load", function() {
+            console.log("window 객체의 load 이벤트 핸들러2")
+        }, false)
+
+        window.addEventListener("load", function() {
+            console.log("window 객체의 load 이벤트 핸들러3")
+        }, false) // 1~3 모두 출력(=하나의 이벤트에 대해서 여러 이벤트 핸들러 등록 가능)
+        */
+
+
+        /* 버튼을 누르면 Count 증가 구성 */
+        window.onload = function() {
+            let count = 0
+            let btnEl = document.getElementById("btn")
+            btnEl.onclick = function() {
+                count++
+                document.getElementById("counter").innerHTML = count // count 값을 span에 할당
+                this.onclick = null // 이벤트 종료가 되어 더이상 버튼 동작 불가(한번만 실행되게 됨).
+            }
+
+
+            /* 이벤트 강제 발생 로직 */
+            let count1 = 0, count2 = 0
+            let btn1El = document.getElementById("btn1")
+            btn1El.onclick = function() {
+                count1++
+                document.getElementById("count1").innerHTML = count1
+            }
+
+            let btn2El = document.getElementById("btn2")
+            btn2El.onclick = function() {
+                count2++
+                document.getElementById("count2").innerHTML = count2
+                btn1El.onclick() // 강제 이벤트 발생. 버튼2를 누르면 버튼1도 같이 값 증가
+            }
+        }
+    </script>
+</head>
+<body>
+    <pre>
+    DOM Level 0 이벤트 처리 방식 : 초기 이벤트 핸들러 등록 방식
+     - on이벤트 = 이벤트 핸들러(); 방식으로 작성
+     - 이벤트의 핸들러를 하나만 등록할 수 있다. (단점)
+    DOM Level 2 이벤트 처리 방식 : W3C 표준 이벤트 핸들러 등록 방식
+     - 이벤트소스객체.addEventListner(이벤트명, 이벤트 핸들러 함수, 이벤트 캡쳐여부(Boolean - default: false)); 방식으로 작성
+     - 하나의 이벤트에 대해 여러 이벤트 핸들러를 등록할 수 있다. (장점)
+    </pre>
+
+    <br>
+    <button id="btn">Count</button>
+    <span id="counter"></span>
+
+    <br><br>
+    <button id="btn1">버튼1</button>
+    <button id="btn2">버튼2</button>
+    <h3>버튼1 클릭 횟수 : <span id="count1"></span> </h3> 
+    <h3>버튼2 클릭 횟수 : <span id="count2"></span> </h3>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 이벤트 전파</title>
+    <style>
+        div, h1, p {
+            border: 2px solid black;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        window.onload = () => {
+            document.getElementById("outerDiv").onclick = function() {
+                this.style.backgroundColor = "cyan"
+            }
+            document.getElementById("innerDiv").onclick = function() {
+                this.style.backgroundColor = "green"
+            }
+            document.getElementById("heading1").onclick = function(event) {
+                event.stopPropagation() // stopPropagation() 메서드는 이벤트 전파를 취소시킨다.
+                 // 자동으로 전달받는 HTMLEvent 객체를 통해 이벤트 전파 메서드 실행.
+                this.style.backgroundColor = "orange"
+            }
+            document.getElementById("p1").onclick = function() {
+                this.style.backgroundColor = "pink"
+            } /* p1 태그를 클릭 시, 모든 이벤트가 동작한다. 이는 기본 이벤트 방식이 버블링인 것을 알 수 있다.
+               * stopPropagation()를 사용한 경우에는 h1 태그에서 전파가 막힌다. */
+            
+            document.getElementById("searchForm").onclick = function(event) {
+                event.preventDefault() // 브라우저의 기본 이벤트 취소
+            }
+
+            document.getElementById("link1").onclick = function() {
+                return false // 브라우저의 기본 이벤트 취소(옛날 방식. 권장 X)
+            }
+        } 
+    </script>
+</head>
+<body>
+    이벤트 전파 방식 <br>
+    1. Event Bubbling : child element(HTML 태그)에서 발생된 이벤트가 parent element로 전파(Browser의 이벤트 전파 방식) <br>
+    2. Event Capturing : parent element에서 발생된 이벤트가 child element들로 전파 <br>
+    JavaScript 엔진은 이벤트 발생 시, 모든 이벤트 핸들러 함수를 호출할 때, 첫번째 인수로 발생한 이벤트 정보가 저장된 HTMLEvent 객체를 자동으로 전달한다. <br>
+    기본 이벤트 전파를 취소하려면 HTMLEvent 객체의 stopPropagation() 메서드를 호출하면 된다. <br>
+    <div id="outerDiv">
+        <div id="innerDiv">
+            <h1 id="heading1">
+                <p id="p1"> 이벤트 전파 확인 </p>
+            </h1>
+        </div>
+    </div>
+
+    <br><hr>
+    브라우저 기본 처리 이벤트 <br>
+    - 기본으로 처리되는 이벤트를 취소시켜야 하는 경우, HTMLEvent 객체의 preventDefault() 메서드를 사용한다. <br>
+    <form id="searchForm" action="search.jsp">
+        검색어 <input type="search" name="searchWord">
+        <input type="submit" value="검색">
+    </form> <!-- 이벤트를 별도로 구성하지 않아도 input에 입력된 값이 자동으로 URL에 QueryString으로 추가되어 전달된다. -->
+
+    <a href="http://www.google.co.kr" id="link1" target="_blank">구글</a>
+    <!-- 이벤트를 별도로 구성하지 않아도 자동으로 연결된 링크로 이동한다. -->
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 이벤트 예제 : 과일 선택하면 메세지창 띄우기(자체 구성)</title>
+    <script>
+        window.onload = function() {
+            document.getElementById("input").onchange = function() {
+                let selectFriuit = document.getElementById("friuits");
+                if(selectFriuit.value != "") {
+                    alert(`선택된 과일은 ${selectFriuit.value} 입니다`);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <form id="input" action="#">
+        <label for="friuits">과일</label>
+        <select name="friuits" id="friuits">
+          <option value="">선택하세요</option>
+          <option value="apple">사과</option>
+          <option value="banana">바나나</option>
+          <option value="cherry">체리</option>
+        </select>
+      </form>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 이벤트 예제 : 과일 선택하면 메세지창 띄우기(강사님 구성)</title>
+</head>
+<body>
+    <h3>과일을 선택하세요</h3>
+    <select id="fruitSelect">
+        <option value="">-- 선택하세요 --</option>
+        <option value="사과">사과</option>
+        <option value="바나나">바나나</option>
+        <option value="오렌지">오렌지</option>
+        <option value="딸기">딸기</option>
+    </select>
+    <script>
+        const fruitSelect = document.getElementById("fruitSelect");
+        fruitSelect.addEventListener("change", function() {
+            const selectedValue = this.value;
+            if(selectedValue) {
+                alert(selectedValue+"를 선택하였습니다");
+            }
+        }, false);
+    </script>
+</body>
+```
+
+
+## JavaScript 브라우저 객체 모델(BOM) API
+```html
+<body>
+    이미지 클릭 시, 새창에서 크게 열리도록 구성 <br>
+    <img id="img" width="100px" height="100px" src="https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp" alt="라이언">
+    <script>
+        let imgEL = document.getElementById("img")
+        imgEL.addEventListener("click", function() {
+            window.open('./image.html', "", "width=1000, height=1000", "_blank")
+             // 새창은 image.html, 사이즈는 1000x1000
+        }, false) 
+    </script>
+    <!-- image.html 내용
+     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script>
+            window.onload = function() {
+                document.body.addEventListener("click", function() {
+                    window.close() // body 클릭 시, 화면 닫힘
+                }, false)
+            }
+        </script>
+    </head>
+    <body>
+        <img src="https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp" alt="라이언">
+    </body>
+    -->
+</body>
+```
+```html
+<body>
+    screen 객체는 사용자의 화면과 관련된 정보를 제공하는 객체이다. <br>
+    <script>
+        console.log(screen);
+        var nowWidth = screen.width;
+        var nowHeight = screen.height;
+        var nowAvailWidth = screen.availWidth;
+        var nowAvailHeight = screen.availHeight;
+        var nowColorDepth = screen.colorDepth;
+        var nowPixelDepth = screen.pixelDepth;
+        
+        document.write("화면의 너비[screen.width] : " + nowWidth, "<br>");
+        document.write("화면의 높이[screen.height] : " + nowHeight, "<br>");
+        document.write("화면의 너비(작업표시줄 제외)[screen.availWidth] : " + nowAvailWidth, "<br>");
+        document.write("화면의 높이(작업표시줄 제외)[screen.availHeight] : " + nowAvailHeight, "<br>");
+        document.write("컬러 색상 수[screen.colorDepth] : " + nowColorDepth, "<br>");
+        document.write("픽셀당 비트 수[screen.pixelDepth] : " + nowPixelDepth, "<br>");
+
+        for(key in screen) {
+            console.log("*", key, screen[key])
+        }
+    </script>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페이지 새로고침할 때마다 배경색이 변경 시키기</title>
+    <script>
+        function getColor() {
+            const r = Math.floor(Math.random() * 255 + 1)
+            const g = Math.floor(Math.random() * 255 + 1)
+            const b = Math.floor(Math.random() * 255 + 1)
+            return `rgb(${r}, ${g}, ${b})`
+        }
+        window.onload = function() {
+            document.body.style.backgroundColor = getColor()
+        }
+        function changeColor() {
+            location.href = location.href
+        }
+    </script>
+</head>
+<body>
+    페이지 새로고침 방법 <br>
+    1. location.href = location.href <br>
+    2. location.reload() <br>
+    3. location.assign(location.href) <br>
+    4. lication.replcae(location.href) <br>
+    5. location = location <br>
+
+    <button id="refresh" onclick="changeColor()">클릭하면 새로고침이 됩니다.</button>
+</body>
+```
+
+
+## JavaScript HTML 객체 모델(DOM) API
+```html
+```
+
+
+## JavaScript 예외처리
+```html
+```
+
+
+## 비동기 Ajax / Promise
+```html
+```
 
 
 ## 기타 - JS load 이벤트
- - load이벤트는 html의 모든 요소가 메모리에 객체 트리로 로드가 완료되었을 때 발생한다.
+ - load이벤트는 html의 모든 요소가 메모리에 객체 트리로 로드가 완료되었을 때 동작한다.
+ - /html 태그까지 모두 읽은 다음 메모리에 로드가 완료되었을 때 동작.
     ```javascript
     windows.onload = function() {
         window.alert('외부파일 main.js가 실행되었습니다');
@@ -1420,3 +1991,10 @@ body {
  - [W3C 가이드 사이트](https://www.w3schools.com/)
 
 
+## 기타 - 개발 TOOL
+ - 개발 TOOL : vscode 활용
+ - 사용 plugin
+    - Live Server : Tomcat과 같은 환경 필요없이 vscode에서 자체적으로 웹서버 open
+    - Prettier : 소스 코드 색상 구분
+    - Korean Language Pack : vscode 한글화
+    - vscode-pdf : vscode에 pdf reader 설치
