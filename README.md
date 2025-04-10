@@ -26,12 +26,19 @@
     12-1. [Closure 함수](#closure-함수)  
     12-2. [함수 내부에서의 this](#함수-내부에서의-this)
  13. [JavaScript 객체](#javascript-객체)  
-    13-1. [JavaScript의 AccessModifier](#javascript의-accessmodifier)
+    13-1. [JavaScript의 AccessModifier](#javascript의-accessmodifier)  
+    13-2. [Map 과 Set 자료구조](#map-과-set-자료구조)  
+    13-3. [모듈(export/import)](#모듈exportimport)
  14. [JavaScript 내장 객체](#javascript-내장-객체)  
     14-1. [JSON의 내장 객체 stringify(직렬화)/parse(역직렬화) (+브라우저 storage/DOM API)](#json의-내장-객체-stringify직렬화parse역직렬화-브라우저-storagedom-api)
- 15. [JavaScript 이벤트 제어](#javascript-이벤트-제어)
- 97. [기타 - JS load 이벤트](#기타---js-load-이벤트)
+ 15. [JavaScript 이벤트 제어](#javascript-이벤트-제어)  
+    15-1. [load 이벤트](#load-이벤트)
+ 16. [JavaScript 브라우저 객체 모델(BOM, Browser Object Model) API](#javascript-브라우저-객체-모델bom-browser-object-model-api)
+ 17. [JavaScript HTML 객체 모델(DOM, Document Object Model) API](#javascript-html-객체-모델dom-document-object-model-api)
+ 18. [JavaScript 예외처리](#javascript-예외처리)
+ 19. [Ajax(Asynchronous JavaScript And XML)](#ajaxasynchronous-javascript-and-xml)
  98. [기타 - Node.js에서 입/출력 하기](#기타---nodejs에서-입출력-하기)
+ 98. [cors (cross origin resource sharing) : 웹의 기본 보안 정책](#cors-cross-origin-resource-sharing--웹의-기본-보안-정책)
  99. [기타 - 참고 사이트](#기타---참고-사이트)
  99. [기타 - 개발 TOOL](#기타---개발-tool)
 
@@ -1496,6 +1503,144 @@ body {
 </body>
 ```
 
+### Map 과 Set 자료구조
+```html
+<body>
+    ES6에서 추가된 Map(key, value로 저장하는 자류구조), Set(value 저장, 중복 허용하지 않음) 자료구조가 있다. <br>
+     - Map에 저장되는 key는 unique 해야 한다. (value는 중복 가능하다) <br>
+     - Map에 저장되는 key에는 배열, 객체, 함수를 사용할 수 있다. <br>
+     - Map에 저장된 순서대로 요소들을 순회한다. <br>
+     - Set도 저장한 순서대로 요소들을 순회한다. <br>
+        - add(), has(), delete(), clear(), size, forEach(callback) 메서드들이 제공된다. <br>
+    <script>
+        const map1 = new Map()
+        map1.set('name', 'korea') // map 내용 추가
+        map1.set('age', '30')
+        map1.set(1, 'one')
+        console.log(map1.get('name')) // korea
+        console.log(map1.has('email')) // false (email이라는 key는 없다.)
+        console.log(map1.size) // 3
+
+        map1.delete('age') // map 내용 삭제
+        console.log(map1.size) // 2
+
+        map1.set('email', 'test@naver.com')
+        map1.set('address', '1111-1111')
+
+        map1.forEach((key, value) => { // forEach()로 요소 순회
+            console.log(`${key}: ${value}`) // 저장된 순서대로 요소가 순회한다(출력된다)
+        })
+
+        map1.clear() // map 내용 전체 삭제
+        console.log(map1.size) // 0
+
+        const set1 = new Set([1, 2, 2, 2, 3])
+        console.log(set1) // [1, 2, 3] (중복을 허용하지 않는다.)
+        console.log(set1.has(4)) // false
+    </script>
+</body>
+```
+
+## 모듈(export/import)
+ - ES6에서 함수 또는 클래스를 파일 단위로 모듈화하여 관리할 수 있는 기능이 추가되었다.
+ - export와 import 키워드를 사용해서 파일에 저장된 기능을 내보내기/가져오기를 할 수 있다.
+ - 코드의 재사용성, 유지보수성을 향상 시키게 되었다.
+ - 브라우저의 html 페이지에서 모듈을 사용하려면 script 태그의 type 속성에 module이라고 선언해야 한다.
+    - 기본 타입은 type="text/javascript" 이다.
+    ```plainttext
+    <script type="text/javascript" src="..."></script> // 기본 사용(생략해도 됨.)
+    <script type="module" src="..."></script> // 모듈 사용 시
+    ```
+ - 모듈 파일의 확장자는 .js 이다.
+ - 모듈은 import를 사용해서 로드될 때 비동기 방식으로(Promise 객체로) 로드된다.
+ - 실행중에 동적으로 모듈을 로드할때 import() 함수를 사용한다. (Promise 객체가 반환된다)
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모듈 : export와 import</title>
+</head>
+<body>
+    <div id="div1"></div>
+    <script type="module" src="./main.js"></script>
+
+    <script>
+        import('./utills.js').then(module => {
+            console.log(module.add(4,4))
+        }) // 실행중에도 동적으로 모듈을 로드 할 수 있다.
+    </script>
+</body>
+```
+```javascript
+/* main.js */
+import { add, substract } from './utills.js'
+ // 비동기 객체로 로드된다.
+ // add, subtract 명칭으로 분해 할당이 된다.
+
+import { PI, E } from './constants.js'
+ // PI, E 명칭으로 분해 할당
+
+import { person } from './person.js'
+ // person 명칭으로 분해 할당
+
+console.log(person.name) // Seoul
+console.log(person.age) // 30
+console.log(PI) // 3.14159
+console.log(E) // 2.71828
+console.log(add(2,2)) // 4
+console.log(substract(3,2)) // 1
+
+// HTML에 내용 삽입
+document.getElementById("div1").innerHTML = `
+        <ul>
+            <li>person.name: ${person.name}</li>
+            <li>person.age: ${person.age}</li>
+            <li>add(2,2): ${add(2,2)}</li>
+            <li>substract(3,2): ${substract(3,2)}</li>
+            <li>PI: ${PI}</li>
+            <li>E: ${E}</li>
+        </ul>`
+```
+```javascript
+/* constants.js */
+export const PI = 3.14159
+export const E = 2.71828
+```
+```javascript
+/* person.js */
+const person = {
+    name: "Seoul",
+    age: 30
+}
+
+export { person }
+```
+```javascript
+/* utills.js */
+export function add(a, b) {
+    return a + b
+}
+
+export function substract(a, b) {
+    return a - b
+}
+```
+ - export default를 사용하면 모듈에서 하나의 기본 값 또는 객체 또는 함수를 내보낼 수 있다.
+ - export default를 사용하면 import 할 때, { } 없이 가져오기 할 수 있다.
+```javascript
+/* main.js */
+import test from "./math.js";
+ // export default 인 경우, import 받을 때 원하는 명칭으로 구성할 수 있다.
+
+console.log(test(4,4))
+```
+```javascript
+/* math.js */
+export default function multiply(a, b) {
+    return a * b
+}
+```
+
 
 ## JavaScript 내장 객체
 ```html
@@ -1711,11 +1856,14 @@ body {
 <body>
     <pre>
     DOM Level 0 이벤트 처리 방식 : 초기 이벤트 핸들러 등록 방식
-     - on이벤트 = 이벤트 핸들러(); 방식으로 작성
+     - on이벤트명 = 이벤트 핸들러 함수(event객체){ }; 방식으로 작성
+        - event객체는 자동으로 전달받는다.
      - 이벤트의 핸들러를 하나만 등록할 수 있다. (단점)
     DOM Level 2 이벤트 처리 방식 : W3C 표준 이벤트 핸들러 등록 방식
-     - 이벤트소스객체.addEventListner(이벤트명, 이벤트 핸들러 함수, 이벤트 캡쳐여부(Boolean - default: false)); 방식으로 작성
+     - 이벤트소스객체.addEventListener(이벤트명, 이벤트 핸들러 함수, 이벤트 캡쳐여부(Boolean - default: false)); 방식으로 작성
      - 하나의 이벤트에 대해 여러 이벤트 핸들러를 등록할 수 있다. (장점)
+     - 이벤트를 제거하고자 할 때는 "이벤트소스객체.removeEventListener(이벤트명, 이벤트 핸들러 함수)" 와 같이 작성할 수 있다
+        - 또는 "이벤트소스객체.on이벤트명 = null;" 로 처리할 수도 있다.
     </pre>
 
     <br>
@@ -1851,8 +1999,24 @@ body {
 </body>
 ```
 
+### load 이벤트
+ - load이벤트는 html의 모든 요소가 메모리에 객체 트리로 로드가 완료되었을 때 동작한다.
+ - /html 태그까지 모두 읽은 다음 메모리에 로드가 완료되었을 때 동작.
+    ```javascript
+    windows.onload = function() {
+        window.alert('외부파일 main.js가 실행되었습니다');
+    }
+    ```
 
-## JavaScript 브라우저 객체 모델(BOM) API
+
+## JavaScript 브라우저 객체 모델(BOM, Browser Object Model) API
+ - 대표적인 BOM 객체는 window 객체가 있다.
+    - alert(), prompt(), confirm(), setInterval(), clearInterval(), open(), close, on이벤트명, document, navigator, location, screen, history....
+        - 해당 대상들은 window의 객체이기 때문에 브라우저의 전역 객체가 된다.
+            - 즉, window.screen이 아닌 screen 과 같이 사용 가능하다.
+    - screen : 브라우저별로 화면 속성이 서로 다르기 때문에 운영체제와 관련 screen 속성 제공
+    - location : html 페이지 이동, 새로고침등의 기능 제공(href 속성, assign(), reload(), replace, location=location), url관련 정보를 추출
+    - history : 브라우저의 user가 방문했었던 페이지 목록 저장 및 이동 메소드를 제공한다. SPA(Single Page Application) 개발 시, 유용하다.
 ```html
 <body>
     이미지 클릭 시, 새창에서 크게 열리도록 구성 <br>
@@ -1912,7 +2076,7 @@ body {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>페이지 새로고침할 때마다 배경색이 변경 시키기</title>
+    <title>페이지 새로고침할 때마다 배경색 변경 시키기</title>
     <script>
         function getColor() {
             const r = Math.floor(Math.random() * 255 + 1)
@@ -1933,37 +2097,833 @@ body {
     1. location.href = location.href <br>
     2. location.reload() <br>
     3. location.assign(location.href) <br>
-    4. lication.replcae(location.href) <br>
+    4. location.replcae(location.href) <br>
     5. location = location <br>
 
     <button id="refresh" onclick="changeColor()">클릭하면 새로고침이 됩니다.</button>
 </body>
 ```
-
-
-## JavaScript HTML 객체 모델(DOM) API
 ```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>navigator 객체로 현재 위치 정보 받아오기</title>
+    <script>
+        function getLocation() {
+            let pEL = document.getElementById("status")
+            navigator.geolocation.getCurrentPosition((position) => {
+                const latitude = position.coords.latitude
+                const longitude = position.coords.longitude
+                pEL.textContent = `위치 :  위도 ${latitude}, 경도 ${longitude}`
+            }, (error) => {
+                pEL.textContent = `에러 발생 : ${error.code}` // 에러 발생 시의 에러 내용 출력
+                // 에러 상수들 error.PERMISSION_DENIDE, error.POSITION_UNAVAILABLE, error.TIMEOUT...
+            }, {
+                enableHighAccuracy: true, // 고도 정보 받아올 수 있도록 허용
+                timeout: 10000, // 타임 아웃
+                maximumAge: 0 // 유휴 시간
+            })
+        }
+    </script>
+</head>
+<body>
+    navigator 객체는 브라우저 정보 제공 <br>
+    <script>
+        console.log(navigator.cookieEnabled) // true (쿠키 활성화 여부)
+        console.log(navigator.language) // ko-KR (언어 정보)
+        console.log(navigator.onLine) // true (온라인 상태 여부)
+        console.log(navigator.userAgent) // chrome 어쩌구저쩌구... (유저 정보)
+    </script>
+    navigator.geolocation 객체는 위치 정보(위도, 경도, 정화도, 고도, 속도, 방향 등등)를 제공한다. <br>
+    - IP를 할당해주는 서버의 위치에 따라 데이터가 달라질 수 있어 위치 정보를 완전히 신뢰하진 못한다. <br>
+      - 화성에 있는데 위치 정보는 용인으로 나온다든지... <br>
+    - getCurrentPosition(), watchPosition(), clearWatch()... <br>
+
+    <h2> 현재 위치 정보 </h2>
+    <button onclick="getLocation()"> 위치 정보 가져오기 </button>
+    <p id="status"></p>
+</body>
+```
+
+
+## JavaScript HTML 객체 모델(DOM, Document Object Model) API
+ - DOM API는 html 문서에 요소 검색, 새로운 요소 추가, 요소 변경, 삭제, 속성 추가 등을 할 수 있다.
+    - 즉, 동적으로 문서 구조를 변경할 수 있다.
+ - DOM 요소에서 자주 사용하는 주요 속성들
+    - innerHTML : HTML태그를 포함하는 내용을 설정
+    - textContent : 태그의 내용으로 순수한 텍스트를 설정
+    - value : input 태그, textarea 태그에서 사용자가 입력한 값이 저장되는 속성
+    - className : 클래스 이름을 문자열로 반환 및 설정
+    - classList : 클래스 속성의 값 목록
+    - id
+    - style
+    - attributes
+    - parentElement
+    - child
+    - children
+    - nextElementSibling
+    - previousElementSibling
+    - firstElementChild
+    - LastElementChild
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM API : 요소 검색</title>
+</head>
+<body>
+    <pre>
+    [HTML문서의 요소를 검색]
+     - document.getElementById(id) : id 속성으로 element 객체를 검색, 1개만 반환
+     - document.getElementsByTagName('HTML 태그이름') : 검색된 조건에 일치하는 모든 element를 배열과 유사한 HTMLCollection 으로 반환
+     - document.getElementsByName(name) : name 속성으로 element 객체를 검색, 검색된 조건에 일치하는 모든 element를 배열과 유사한 HTMLCollection 으로 반환
+     - document.getElementsByClassName(class) : class 속성으로 element 객체를 검색, 검색된 조건에 일치하는 모든 element를 배열과 유사한 HTMLCollection 으로 반환
+     - document.querySelector('css의 selector 문법을 조건으로 활용') : (HTML5에서 추가)검색된 조건에 일치하는 element 중, 첫번째 검색된 1개만 반환
+     - document.querySelectorAll('css의 selector 문법을 조건으로 활용') : (HTML5에서 추가)검색된 조건에 일치하는 모든 element를 배열과 유사한 HTMLCollection 으로 반환
+    </pre>
+    <hr>
+    <ul class="menu">
+        <li>Home</li>
+        <li id="about">About</li>
+        <li>Contact</li>
+        <li>sitemap</li>
+    </ul>
+    <script>
+        let item1 = document.querySelector('.menu li') // class=menu 아래에 모든 li 태그
+        let items1 = document.querySelectorAll('.menu li') // class=menu 아래에 모든 li 태그
+        let items2 = document.querySelectorAll('.menu > li') // class=menu 아래에 자식 li 태그
+        console.log(item1) // Home 데이터를 가진 li 태그만 출력
+        console.log(items1) // li 태그 전체 출력
+        console.log(items2) // li 태그 전체 출력
+
+        items1.forEach((item, index) => { // 요소들의 내용 출력
+          console.log(`${index+1} :`, item.textContent);
+       })
+    </script>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM API : 요소 추가</title>
+    <script>
+        window.onload = function() {
+            /* 방법1 */
+            let h3El1 = document.createElement("h3");
+            h3El1.textContent = '안녕하세요'
+
+            /* 방법2 */
+            let h3El2 = document.createElement("h3");
+            let textNode = document.createTextNode("안녕하세요2")
+            h3El2.appendChild(textNode)
+
+            /* 방법3 */
+            let h3El3 = document.createElement("h3")
+            h3El3.innerHTML = "<mark><strong> 안녕하세요3 </strong></mark>"
+            
+            document.body.appendChild(h3El1)
+            document.body.appendChild(h3El2)
+            document.body.appendChild(h3El3)
+
+            
+            /* 방법1 */
+            let imgEl1 = document.createElement("img")
+            imgEl1.src = 'https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp'
+            imgEl1.width = '200'
+            imgEl1.height = '200'
+
+            /* 방법2 */
+            let imgEl2 = document.createElement("img")
+            imgEl2.setAttribute('src', 'https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp')
+            
+            document.body.appendChild(imgEl1)
+            document.body.appendChild(imgEl2)
+        }
+    </script>
+</head>
+<body>
+
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM API : 버튼 클릭 시, 선택된 대상들 출력</title>
+    <style type="text/css">
+        td {
+            border-style: solid;
+            border-width: 1px;
+            font-size: 200%;
+        }
+
+        #checkedResult {
+            color: green;
+            font-size: 200%;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            let btnEl = document.getElementById("findChecked")
+            btnEl.onclick = function() {
+                let inputEls = document.querySelectorAll("input:checked") // input 태그의 checked 속성이 있는 대상들
+                inputEls.forEach((item, index) => {
+                    document.querySelector("#checkedResult").innerHTML += inputEls[index].name + ", "
+                })
+            }
+        }
+    </script>
+</head>
+<body>
+    <section>
+        <table>
+            <tr>
+                <td><input type="checkbox" name="A1">A1</td>
+                <td><input type="checkbox" name="A2">A2</td>
+                <td><input type="checkbox" name="A3">A3</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="B1">B1</td>
+                <td><input type="checkbox" checked name="B2">B2</td>
+                <td><input type="checkbox" name="B3">B3</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="C1">C1</td>
+                <td><input type="checkbox" name="C2">C2</td>
+                <td><input type="checkbox" name="C3">C3</td>
+            </tr>
+        </table>
+        
+        <div>Select various checkboxes, then hit the button to identify them using querySelectorAll("*:checked").</div>
+        <button type="button" id="findChecked" autofocus>Find checked boxes</button>
+        <div id="checkedResult"></div>
+      </section>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM API : 키보드 엔터 시, 마우스 선택된(hover) 대상 출력</title>
+    <style>
+        td {
+            border-style: solid;
+            border-width: 1px;
+            font-size: 300%;
+        }
+
+        td:hover {
+            background-color: cyan;
+        }
+
+        #hoverResult {
+            color: green;
+            font-size: 200%;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            var btnEl = document.querySelector('#findHover')
+            btnEl.onclick = function() {
+                var tdEl = document.querySelector("td:hover")
+                document.querySelector("#hoverResult").innerHTML += tdEl.innerHTML
+            }
+        }
+    </script>
+</head>
+<body>
+    <section>
+        <table>
+            <tr>
+                <td>A1</td>
+                <td>A2</td>
+                <td>A3</td>
+            </tr>
+            <tr>
+                <td>B1</td>
+                <td>B2</td>
+                <td>B3</td>
+            </tr>
+            <tr>
+                <td>C1</td>
+                <td>C2</td>
+                <td>C3</td>
+            </tr>
+        </table>
+        <button type="button" id="findHover" autofocus>Find 'td:hover' target</button>
+        <div id="hoverResult"></div>		
+    </section>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM API : 여러가지 활용해보기(자체구성)</title>
+    <style>
+		body{
+			font-size:9pt;
+		
+		}
+		
+		div{
+			border: 1px solid #999999;
+			margin:20px;
+			margin-bottom:20px;
+		}
+		div div{
+			border: 1px dotted #CCC;
+			
+		}
+		
+		.active{
+			font-size:20pt;
+			color:#090;
+			border:5px solid #ff0000;
+		}
+	</style>
+    <script>
+        window.onload = function() {
+            let divM1El = document.getElementById("m_1")
+            divM1El.style.color = 'red'
+
+            let divM2El = document.querySelector("#m_2")
+            divM2El.className = "active"
+
+            let divM3El = document.querySelector("#m_3")
+            let divM3ChildEl = divM3El.lastElementChild
+            divM3El.removeChild(divM3ChildEl)
+            let imgEl = document.createElement("img")
+            imgEl.setAttribute("src", "https://i.namu.wiki/i/uVfvrrdFdovVGY2KqvW0S3cgurcNpVLtXkM6kjp22wE4QvCmRV1BlZtNSgTMn3XDJk1cnDDSACmGwS2gq5iv6ItS1I0nrl_gWuVrYqa0Yip_SzFXc5iVPSONyf32Pt9eOfcRvQ1lsXnINlQJtcT05g.webp")
+            divM3El.appendChild(imgEl)
+
+            let divM4El = document.querySelector("#m_4")
+            let pEl = document.createElement("p")
+            pEl.textContent = "항목4"
+            divM4El.appendChild(pEl)
+
+            let divM5El = document.querySelector("#m_5")
+            let pEls = document.querySelectorAll("#m_5 > p") // m_5 자식인 p 태그 찾기
+            pEls.forEach((item, index) => {
+                if(item.textContent.includes("항목4")) {
+                    item.remove()
+                }
+            })
+
+            let divM6El = document.querySelector("#m_6")
+            let divM6ParentEl = divM6El.parentElement
+            divM6ParentEl.remove()
+        }
+    </script>
+</head>
+<body>
+    <div> 
+		<h4>테스트1</h4>
+		<div id="m_1">
+			#m_1 : 글자색을 빨간색으로 변경해주세요.
+		</div>
+	</div>
+	<div> 
+		<h4>테스트2</h4>
+		<div id="m_2">
+			#m_2 : 클래스 active를 적용시켜 주세요.
+		</div>
+	</div>
+	<div> 
+		<h4>테스트3</h4>
+		<div id="m_3">
+			#m_3 : 에고 이 이미지가 아닌데... 이미지를 춘식이로 변경해주세요"<br>
+			<img src="https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp">
+		</div>
+	</div>
+	<div> 
+		<h4>테스트4</h4>
+		<div id="m_4">
+			#m_ 4 :  홋! 항목4까지 있어야 하는건데, 바쁜나머지 실수를 했군요. 항목4를 제일 뒤에 추가해주시겠어요?
+			<p>
+				항목1
+			</p>
+			<p>
+				항목2
+			</p>
+			<p>
+				항목3
+			</p>
+		</div>
+	</div>
+	<div> 
+		<h4>테스트5</h4>
+		<div id="m_5">
+			#m_ 5 :  이번에는 항목4가 더 추가되었네요. 즉시 삭제해주세요.
+			<p>
+				항목1
+			</p>
+			<p>
+				항목4
+			</p>
+			<p>
+				항목2
+			</p>
+		</div>
+	</div>
+	<div> 
+		<h4>테스트6</h4>
+		<div id="m_6">
+			#m_ 6 : 이런이런! 이 부분은 전혀 필요없는 내용들인데 왜 있는거죠? #m_6부터 헤더태그까지 모두 삭제해주세요.
+			<p>
+				DOM(Document Object Model)이란?<br>
+				웹페이지 문서를 조작하기 위해서 지켜야될 약속(interface)만 딸랑 적혀있는 문서랍니다.
+				약속만 있을뿐 내부는 텅빈 상자랍니다.
+				우리가 알고있는 W3C DOM에는 구현소스가 한줄도 존재하지 않습니다.
+				그럼 실제 구현소스는??
+			</p>
+		</div>
+	</div>
+</body>
+```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM API : 여러가지 활용해보기(강사님 구성)</title>
+    <style>
+		body{
+			font-size:9pt;
+		
+		}
+		
+		div{
+			border: 1px solid #999999;
+			margin:20px;
+			margin-bottom:20px;
+		}
+		div div{
+			border: 1px dotted #CCC;
+			
+		}
+		
+		.active{
+			font-size:20pt;
+			color:#090;
+			border:5px solid #ff0000;
+		}
+	</style>
+    <script>
+        window.onload = function() {
+            let div1 = document.querySelector("#m_1")
+            div1.setAttribute("style", "color:red")
+
+            let div2 = document.querySelector("#m_2")
+            div2.setAttribute("class", "active")
+
+            let div3 = document.querySelector("#m_3")
+            let image = div3.querySelector("img")
+            image.setAttribute("src", "https://i.namu.wiki/i/uVfvrrdFdovVGY2KqvW0S3cgurcNpVLtXkM6kjp22wE4QvCmRV1BlZtNSgTMn3XDJk1cnDDSACmGwS2gq5iv6ItS1I0nrl_gWuVrYqa0Yip_SzFXc5iVPSONyf32Pt9eOfcRvQ1lsXnINlQJtcT05g.webp")
+
+            let div4 = document.querySelector("#m_4")
+            let p = document.createElement("p")
+            p.textContent = "항목4"
+            div4.appendChild(p)
+
+            let div5 = document.querySelector("#m_5")
+            let ps = div5.querySelectorAll("p")
+            ps.forEach((item, index) => {
+                if(item.textContent.trim() == "항목4") {
+                    div5.removeChild(item)
+                }
+            })
+
+            let div6 = document.querySelector("#m_6")
+            document.body.removeChild(div6.parentNode)
+        }
+    </script>
+</head>
+<body>
+    <div> 
+		<h4>테스트1</h4>
+		<div id="m_1">
+			#m_1 : 글자색을 빨간색으로 변경해주세요.
+		</div>
+	</div>
+	<div> 
+		<h4>테스트2</h4>
+		<div id="m_2">
+			#m_2 : 클래스 active를 적용시켜 주세요.
+		</div>
+	</div>
+	<div> 
+		<h4>테스트3</h4>
+		<div id="m_3">
+			#m_3 : 에고 이 이미지가 아닌데... 이미지를 춘식이로 변경해주세요"<br>
+			<img src="https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp">
+		</div>
+	</div>
+	<div> 
+		<h4>테스트4</h4>
+		<div id="m_4">
+			#m_ 4 :  홋! 항목4까지 있어야 하는건데, 바쁜나머지 실수를 했군요. 항목4를 제일 뒤에 추가해주시겠어요?
+			<p>
+				항목1
+			</p>
+			<p>
+				항목2
+			</p>
+			<p>
+				항목3
+			</p>
+		</div>
+	</div>
+	<div> 
+		<h4>테스트5</h4>
+		<div id="m_5">
+			#m_ 5 :  이번에는 항목4가 더 추가되었네요. 즉시 삭제해주세요.
+			<p>
+				항목1
+			</p>
+			<p>
+				항목4
+			</p>
+			<p>
+				항목2
+			</p>
+		</div>
+	</div>
+	<div> 
+		<h4>테스트6</h4>
+		<div id="m_6">
+			#m_ 6 : 이런이런! 이 부분은 전혀 필요없는 내용들인데 왜 있는거죠? #m_6부터 헤더태그까지 모두 삭제해주세요.
+			<p>
+				DOM(Document Object Model)이란?<br>
+				웹페이지 문서를 조작하기 위해서 지켜야될 약속(interface)만 딸랑 적혀있는 문서랍니다.
+				약속만 있을뿐 내부는 텅빈 상자랍니다.
+				우리가 알고있는 W3C DOM에는 구현소스가 한줄도 존재하지 않습니다.
+				그럼 실제 구현소스는??
+			</p>
+		</div>
+	</div>
+</body>
 ```
 
 
 ## JavaScript 예외처리
+ - Error 객체의 주요 속성
+    - name : 오류 이름(Reference Error, Type Error...)
+    - message : 오류 메시지
+    - stack : 오류가 발생된 코드 위치
 ```html
+<body>
+    <pre>
+        try { 오류가 발생할 수 있는 코드 }
+        catch { 오류가 발생했을 때 오류 처리 코드 }
+        finally { 오류 처리와 상관없이 리소스들 정리 }
+        throw { 오류를 발생시킬 때 사용 }
+    </pre>
+    <script>
+        try {
+            console.log(test) // Reference Error. (없는 변수를 호출)
+        } catch (err) { // Error 객체를 받는다.
+            console.log(err.message) // test is not defined.
+        } finally {
+            console.log("예외가 발생하지 않아도 항상 실행됩니다.")
+        }
+    </script>
+
+    사용자 정의 예외 발생 <br>
+    <script>
+        function devide(a, b) {
+            if (b === 0) {
+                throw new Error("0으로 나눌 수 없습니다.")
+            }
+            return a/b
+        }
+        console.log(devide(5, 2))
+
+        try {
+            console.log(devide(5, 0))
+        } catch (error) {
+            console.log(error.message)
+        }
+    </script>
+
+    Java에서는 catch에서 타입별로 여러개 사용 가능하나, JavaScript는 하나만 사용한다. (타입을 선언안하기도 하고..) <br>
+    오류 유형별 처리 하려면? catch 블럭내부에서 instanceof 타입 비교 조건문 <br>
+    <script>
+        try {
+             JSON.parse("{ invalid json }"); // JSON 문법 오류 발생
+        } catch (error) {
+            if (error instanceof SyntaxError) {
+                console.log("JSON 문법 오류:", error.message);
+            } else if (error instanceof ReferenceError) {
+                console.log("정의되지 않은 변수:", error.message);
+            } else {
+                console.log("기타 오류:", error.message);
+            }
+        }
+    </script>
+
+    기본 Error 객체를 확장하여 사용자 정의 예외(Custom Error)를 만들 수도 있습니다. <br>
+    <script>
+        class CustomError extends Error {
+            constructor(message) {
+                super(message)
+                this.name = "CustomError"
+            }
+        }
+
+        function riskyOperation(value) {
+            if (value < 0) {
+                throw new CustomError("음수 값은 허용되지 않습니다.")
+            }
+            return Math.sqrt(value)
+        }
+
+        try {
+            console.log(riskyOperation(-5))
+        } catch (e) {
+            console.log(`${e.name} : ${e.message}`) // CustomError : 음수 값은 허용되지 않습니다.
+        }
+    </script>
+</body>
 ```
 
 
-## 비동기 Ajax / Promise
-```html
-```
+## Ajax(Asynchronous JavaScript And XML)
+ - 기본 환경(BackEnd) 구성 필요 (강의 환경일 뿐이라 꼭 중요하지 않음)
+    - Java 17 (jdk-17)
+        - JAVA_HOME 환경변수까지 지정
+    - Tomcat 11 (https://tomcat.apache.org/)
+        - 압축파일로 받기
+        - bin 디렉터리 안에 startup.bat을 cmd에서 실행
+            - tomcat cmd가 열림과 tomcat 서버가 시작됨.
+            - 실행된 tomcat cmd 종료 시, tomcat 서버가 종료됨.
+    - DataBase 구성 x
+        - ID : admin / PW : 1234 이면 성공. 그 이외에는 Exception 발생하도록 구성.
+    - 정상 실행 완료 시, http://localhost:8080/ 정상 접속 됨.
+        - 포트 번호 변경 필요 시, conf 폴더에서 server.xml의 내용 수정하면 됨.
+ - 예제1) 로그인 페이지를 만들고 Ajax로 로그인 시도 진행. ID : admin / pw : 1234 가 아닐경우에 Exception 처리 진행.
+    - 로그인 요청을 수동으로 TEST 해보고자 하면 JSP 파일을 이용해보면 된다.
+        - 주소 : http://localhost:8080/loginProc.jsp?userid=admin&userpwd=1234
+        - 요청을 QueryString을 직접 만들어서 진행.
+        - ID/PW 각각 바꿔서도 보내보기
+    - 작성한 파일들은 "tomcat 폴더 -> webapps -> ROOT 폴더"에 넣어야 동작함.
+        - 웹 접속 : http://localhost:8080/partPage.html
+    - 참고로 아래 HTML/CSS/JS를 vscode의 Live Server을 통해서 열고 TEST하면 CORS 에러가 발생한다.
+        - vscode 와 Tomcat 2개의 웹 서버가 구성되어 있는 상태가 되고, vscode 웹 서버에서 Tomcat 서버에 리소스(GET요청)을 보내려는 상태가 되기 때문이다.
+    ```jsp
+    <!-- loginProc.jsp -->
+    <%@ page   contentType="text/xml; charset=utf-8"     %>
+    <%
+        request.setCharacterEncoding("utf-8"); 
+        response.setContentType("text/xml;charset=utf-8");
 
+        String id = request.getParameter("userid"); 
+        String passwd = request.getParameter("userpwd");
 
-## 기타 - JS load 이벤트
- - load이벤트는 html의 모든 요소가 메모리에 객체 트리로 로드가 완료되었을 때 동작한다.
- - /html 태그까지 모두 읽은 다음 메모리에 로드가 완료되었을 때 동작.
-    ```javascript
-    windows.onload = function() {
-        window.alert('외부파일 main.js가 실행되었습니다');
+        String outString = "";
+        int result = 0 ;
+
+        if(id.equals("admin")&&passwd.equals("1234")){
+            result = 1;  //로그인 성공
+        }else if(id.equals("admin")){
+            result = 0;  //패스워드 불일치 
+        }else{
+        result = 2; //아이디 존재하지 않음
+        }
+
+        if(result==1){
+        outString="<response><result>"+ result + "</result><id>"+ id 
+                    +"</id></response>";
+    }else if(result==0){
+        outString="<response><result>"+ result + "</result><id>"+ id 
+            +"</id></response>";
+    }else{
+        outString="<response><result>"+ result + "</result><id>"+ id 
+            +"</id></response>";
+    }  
+    out.println(outString);
+    %>
+    ```
+    ```html
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>로그인 페이지</title>
+        <link rel="stylesheet" href="partPage.css" type="text/css" />
+        <script type="text/javascript" src="partPage.js" charset="UTF-8"></script>
+    </head>
+    <body>
+        <!-- partPage.html -->
+        <h3>부분페이지 동적 갱신</h3>
+        <table border="1">
+        <tr><td colspan="2" align="center"><font size=15><b>우리회사</b></font></td></tr>
+        <tr>
+            <td><form action="#">
+                <div id="confirmed">
+                    <table>
+                        <tr>
+                        <td>아이디</td>
+                        <td><input type="text" id="userid" name="userid" size="15" maxlength="12"/></td>
+                        </tr>
+                        <tr>
+                        <td>비밀번호</td>
+                        <td><input type="password" id="userpwd" name="userpwd" size="15" maxlength="12"/></td>
+                        </tr>
+                        <tr><td colspan="2" align="center">
+                            <input type="button" id="login" value="로그인"  /></td>
+                        </tr>
+                    </table>
+                </div>
+                </form>
+            </td>
+            <td width="400"><img src="https://i.namu.wiki/i/uVfvrrdFdovVGY2KqvW0S3cgurcNpVLtXkM6kjp22wE4QvCmRV1BlZtNSgTMn3XDJk1cnDDSACmGwS2gq5iv6ItS1I0nrl_gWuVrYqa0Yip_SzFXc5iVPSONyf32Pt9eOfcRvQ1lsXnINlQJtcT05g.webp"></td>
+        </tr>
+        <tr><td colspan="2" align="center">찾아오시는길 |회사소개|정보보호정책</td></tr>
+        </table>
+    </body>
+    ```
+    ```css
+    /* partPage.css */
+    div#confirmed{
+    width            : 250px;
+    height           : 100px;
+    background-color : #e0ffff;
+    border-color     : #b0e0e6;
+    border-style     : dotted;
     }
     ```
+    ```javascript
+    /* partPage.js */
+    let xhr
+    window.onload = function() {
+        xhr = new XMLHttpRequest()
+
+        let loginBtn = document.getElementById("login")
+        loginBtn.onclick = function() {
+            let uid = document.getElementById("userid").value
+            let upwd = document.getElementById("userpwd").value
+            let url = "http://localhost:8080/loginProc.jsp?userid=" + uid + "&userpwd=" + upwd
+            
+            xhr.onreadystatechange = resultProcess // 응답을 처리하는 콜백 함수
+            xhr.open("GET", url, true) // true = 비동기 여부로 보내도록 지정.
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+            xhr.send(null) // 서버로 요청 전송(open에 요청 내용이 담겼기 때문에 더이상 할게 없어 null 지정)
+        }
+    }
+
+    function resultProcess() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+            let resultCode = xhr.responseXML.getElementsByTagName("result")[0].firstChild.data
+            let name = xhr.responseXML.getElementsByTagName("id")[0].firstChild.data
+
+            if(resultCode == 1) { // 사용자 인증 성공
+                let str = "<table><tr><td align='center'><b>"+ name + "</b> 님 어서오세요..</td></tr>"
+                str+="<tr><td align='center'><input type='button' id='logout' value='로그아웃' />"
+                str+="</td></tr></table>"
+                document.getElementById("confirmed").innerHTML = str
+                // 로그인 박스를 제거 및 사용자 정보로 채우기
+            } else if (resultCode == 0) {
+                alert("비밀번호가 맞지 않습니다.\n다시 입력해 주시기 바랍니다.")
+                document.getElementById("userid").value = name
+                document.getElementById("userpwd").value = ""
+                document.getElementById("userpwd").focus()
+                // 아이디는 유지, 비밀번호만 공백으로 바꾸고 비밀번호에 마우스 커서가 올라가도록 구성
+            } else {
+                alert("아이디가 맞지 않습니다.\n다시 입력해 주시기 바랍니다.")
+                document.getElementById("userid").value = ""
+                document.getElementById("userpwd").value = ""
+                document.getElementById("userid").focus()
+                // 아이디, 비밀번호 모두 공백으로 바꾸고 아이디에 마우스 커서가 올라가도록 구성
+            }
+        }
+    }
+    ```
+ - 예제2) 버튼을 클릭하면 비동기 요청 (GET) imageProc.jsp 에서 이미지 3개를 JSON객체로 응답
+    - 웹 접속 : http://localhost:8080/image.html
+    - 이미지 리스트 목록 확인 : http://localhost:8080/imageProc.jsp
+    ```jsp
+    <!-- imageProc.jsp -->
+    <%@ page contentType="application/json; charset=utf-8" %>
+    <%
+        String[] imageFiles = {
+            "https://i.namu.wiki/i/0xUderHjxT52FIlpSpYXJEkENhNKU1uPFDbYYXsSFQM-I0SPIlrxM020ImXKUDp1D2rAYGtor-ZX9_fjTxV_-0khoz2HJNvoUa-MEnGRMWNmaVvwjc4tEYQwo1jOHKGBJ0WHVyNSBbEl1_7D2uIcPg.webp",
+            "https://i.namu.wiki/i/uVfvrrdFdovVGY2KqvW0S3cgurcNpVLtXkM6kjp22wE4QvCmRV1BlZtNSgTMn3XDJk1cnDDSACmGwS2gq5iv6ItS1I0nrl_gWuVrYqa0Yip_SzFXc5iVPSONyf32Pt9eOfcRvQ1lsXnINlQJtcT05g.webp",
+            "https://i.namu.wiki/i/41FABs74HgkrPCPzaIAPpmB_koPYG_3TE8GNeShK5uqjaqzOZ3KNnmkvR_VdSlv4F6sgxkJEl2WuY3-7p7vmSuAdFHhYHk-yACEGihEMU5VxdZ47VwOrxbe0Q99PBvovuue9QEMDhKEQE4YlZDmn1A.webp"
+        };
+        StringBuffer json = new StringBuffer();
+        json.append("{\"images\":[");
+        for(int i=0; i<imageFiles.length; i++) {
+            json.append("\"").append(imageFiles[i]).append("\"");
+            if(i<imageFiles.length-1) {
+                json.append(",");
+            }
+        }
+        json.append("]}");
+        out.print(json.toString());
+    %>
+    ```
+    ```html
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            .image_panel{
+                border:1px solid #eeeeee;
+                text-align:center;
+                margin:5px;
+            }
+            .image_panel .title{
+                font-size:9pt;
+                color:#ff0000;
+            }
+        </style>
+        <script type="text/javascript" src="./image.js" charset="UTF-8"></script>
+    </head>
+    <body>
+        <!-- image.html -->
+        <div>
+            <button id="loadImage">이미지 정보 읽어들이기</button>
+        </div>
+        <div id="image_container">
+            <!--여기에 가져온 이미지를 DOM API를 사용해서 추가함-->
+        </div>
+    </body>
+    ```
+    ```javascript
+    /* image.js */
+    window.onload = function() {
+        const btn = document.getElementById("loadImage")
+        btn.onclick = function() {
+            const xhr = new XMLHttpRequest()
+            const url = "http://localhost:8080/imageProc.jsp"
+
+            xhr.open("GET", url, true)
+            xhr.onreadystatechange = function() {
+                if(xhr.readyState === 4 && xhr.status == 200) {
+                    const container = document.getElementById("image_container")
+                    try {
+                        const imageList = JSON.parse(xhr.responseText)
+                        
+                        imageArray = imageList.images
+                        imageArray.forEach((image, idx) => {
+                            const img = document.createElement("img")
+                            img.src = image
+                            container.appendChild(img)
+                        })
+                    } catch(error) {
+                        container.textContent = error.message
+                    }
+                }
+            }
+            xhr.send();
+        }
+    }
+    ```
+
+
+## Promise
+ - Ajax에서 구성한 Backend 환경 구성 필요.
 
 
 ## 기타 - Node.js에서 입/출력 하기
@@ -1985,6 +2945,15 @@ body {
     ```cmd
     cmd> node main.js
     ```
+
+
+## cors (cross origin resource sharing) : 웹의 기본 보안 정책
+ - 통신 중인 웹 서버(A서버) 외에 다른 웹 서버(B서버) 또는 다른 도메인(C도메인)에 HTML 페이지와 기타 리소스들을 공유할 수 없다.
+    - 기본적으로 A서버에서 받은 리소스를 B서버에 공유할 수 없다.
+    - A서버에서 서비스 해주는 웹 페이지에서 B서버의 리소스에 대한 접근이 제한된다.
+        - A서버에서 GET으로 데이터를 받았는데, 그 결과를 B서버에 POST 보내는 등등..
+        - 즉, 자신이 통신중인 서버 외에 다른 서버와의 통신을 할 수 없다는 말이기도 하다.
+ - origin : **프로토콜 + 도메인 + 포트**를 의미 (ex. http://www.test.com:8080)
 
 
 ## 기타 - 참고 사이트
