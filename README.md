@@ -2190,6 +2190,60 @@ export default function multiply(a, b) {
    </div>
 </body>
 ```
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지역 선택기</title>
+    <script>
+        window.onload = function(){
+       
+            const regionData = {
+             서울: ["강남구", "서초구", "종로구", "중구", "노원구"],
+             경기: ["성남시", "고양시", "수원시", "화성시"]
+            };
+
+            const sidoSelect = document.getElementById("sido");
+            const sigunguSelect = document.getElementById("sigungu");
+
+            sidoSelect.addEventListener("change", () => {
+               const selectedSido = sidoSelect.value;                
+               sigunguSelect.innerHTML = "";  // 기존 옵션 제거
+
+            if (regionData[selectedSido]) {
+               regionData[selectedSido].forEach(sigungu => {
+               const option = document.createElement("option");
+               option.value = sigungu;
+               option.textContent = sigungu;
+               sigunguSelect.appendChild(option);
+               });
+            } else {
+               // 선택이 없거나 잘못된 경우 기본 안내 문구 출력
+                const defaultOption = document.createElement("option");
+                defaultOption.value = "";
+                defaultOption.textContent = "-- 먼저 시/도를 선택하세요 --";
+                sigunguSelect.appendChild(defaultOption);
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+    <h2>지역 선택</h2>
+
+    <label for="sido">시/도 선택: </label>
+    <select id="sido">
+      <option value="">-- 선택하세요 --</option>
+      <option value="서울">서울</option>
+      <option value="경기">경기</option>
+    </select>
+  
+    <label for="sigungu">시/군/구 선택: </label>
+    <select id="sigungu">
+      <option value="">-- 먼저 시/도를 선택하세요 --</option>
+    </select>
+</body>
+```
 
 ### load 이벤트
  - load이벤트는 html의 모든 요소가 메모리에 객체 트리로 로드가 완료되었을 때 동작한다.
