@@ -9,7 +9,9 @@
     2-5. [HTML의 form 태그](#html의-form-태그)  
  3. [CSS 특성](#css-특성)  
     3-1. [웹 문서에 Style 적용 3가지 방법](#웹-문서에-style-적용-3가지-방법)  
-    3-2. [CSS 활용해보기](#css-활용해보기)
+    3-2. [CSS 활용해보기](#css-활용해보기)  
+    3-3. [반응형 웹 컨텐츠](#반응형-웹-컨텐츠)  
+    3-4. [Bootstrap](#bootstrap)
  4. [JavaScript 특성](#javascript-특성)  
     4-1. [JavaScript를 HTML 문서에 적용하는 3가지 방법](#javascript를-html-문서에-적용하는-3가지-방법)
  5. [JavaScript 기본 : 입/출력](#javascript-기본--입출력)
@@ -37,14 +39,16 @@
  17. [JavaScript HTML 객체 모델(DOM, Document Object Model) API](#javascript-html-객체-모델dom-document-object-model-api)
  18. [JavaScript 예외처리](#javascript-예외처리)
  19. [Ajax(Asynchronous JavaScript And XML)](#ajaxasynchronous-javascript-and-xml)
- 98. [기타 - Node.js에서 입/출력 하기](#기타---nodejs에서-입출력-하기)
- 98. [cors (cross origin resource sharing) : 웹의 기본 보안 정책](#cors-cross-origin-resource-sharing--웹의-기본-보안-정책)
- 99. [기타 - 참고 사이트](#기타---참고-사이트)
- 99. [기타 - 개발 TOOL](#기타---개발-tool)
+ 20. [Promise, async/await](#promise-asyncawait)  
+    20-1. [Fetch API](#fetch-api)
+ 21. [기타 - Node.js에서 JavaScript 실행 하기](#기타---nodejs에서-javascript-실행-하기)
+ 22. [cors (cross origin resource sharing) : 웹의 기본 보안 정책](#cors-cross-origin-resource-sharing--웹의-기본-보안-정책)
+ 23. [기타 - 참고 사이트](#기타---참고-사이트)
+ 24. [기타 - 개발 TOOL](#기타---개발-tool)
 
 
 ## JavaScript의 등장
- - 1990년에 인터넷이이 등장하였다.
+ - 1990년에 인터넷이 등장하였다.
  - 초기(web 1.0)에는 웹 브라우저의 형태는 HTML만 사용되었으며, 아래와 같은 특징이 있다.
     - 정적인 페이지만 서비스할 수 있다.
         - 만들어진 페이지만 제공한다.
@@ -446,6 +450,86 @@ body {
             </article>
         </section>
     </div>
+</body>
+```
+
+### 반응형 웹 컨텐츠
+ - PDF에 있는 내용들 따라 실습
+    - viewport, CSS 미디어 쿼리...
+ - 실습은 코드 작성 후, 브라우저의 개발자 도구 요소 선택 옆에 화면 전환을 통해 적용 사항 확인 가능
+```html
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <!-- 위 옵션에 따라 device에 따라 viewport 기준으로 사진이나 글자가 조정되는 것을 확인 가능하다. -->
+    <title>반응형 웹 컨텐츠</title>
+</head>
+<body>
+    <img width="450" src="https://i.namu.wiki/i/vvxxU0OGLVbrBNYc-O7rEG8AWdZhytXFi8UF0aQeVTAFurhRz3wGceg27wQca9FYLGEieUm-N2zjcSltkEI9TxJ8hfLjo87rYrRco2bGwZJdcrwSFQrM34cTgPikwZYHioMURLynESSfRDb1nqd2qA.webp">
+    <h2>속초 대포항</h2>
+    <p> 예전에는 배를 댈 공간이 없을 정도로 항구에 어선이 많았고 새벽에 고기를 잡아 돌아온 어선으로 북적였다. 항구로 들어오는 진입로 양옆에는 건어물 가게와 횟집이 늘어서 있고, 어판장 쪽에는 활어 난전이 형성되어 있었다. 요즘은 동해 고속도로가 개통되어 현대적인 시설의 호텔과 콘도, 깔끔한 횟집이 많이 들어섰다.</p>
+</body>
+```
+```html
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>media query 적용</title>
+    <style>
+    body {
+        background-color:#00ff00; /* 초록색 */
+    }
+    
+    @media only screen and (max-width: 600px) {
+    body {
+            background-color:#ffff00; /* 노란색 */
+        }
+    }
+    </style>
+</head>
+<body>
+    
+</body>
+```
+
+### Bootstrap
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>Column 1</h3>
+                <p>test1</p>
+            </div>
+            <div class="col">
+                <h3>Column 2</h3>
+                <p>test2</p>
+            </div>
+            <div class="col">
+                <h3>Column 3</h3>
+                <p>test3</p>
+            </div>
+        </div>
+    </div>
+
+    <br><hr><br>
+
+    <button type="button" class="btn">Basic</button>
+    <button type="button" class="btn btn-primary">Primary</button>
+    <button type="button" class="btn btn-secondary">Secondary</button>
+    <button type="button" class="btn btn-success">Success</button>
+    <button type="button" class="btn btn-info">Info</button>
+    <button type="button" class="btn btn-warning">Warning</button>
+    <button type="button" class="btn btn-danger">Danger</button>
+    <button type="button" class="btn btn-dark">Dark</button>
+    <button type="button" class="btn btn-light">Light</button>
+    <button type="button" class="btn btn-link">Link</button>
 </body>
 ```
 
@@ -1106,6 +1190,39 @@ body {
     </script>
 </body>
 ```
+ - 콜백 헬 예시
+    ```html
+    <body>
+        <script>
+            function firstTask(callback) {
+                setTimeout(() => {
+                    console.log("First task done");
+                    callback();
+                }, 1000);
+            }
+            function secondTask(callback) {
+                setTimeout(() => {
+                    console.log("Second task done");
+                    callback();
+                }, 1000);
+            }
+            function thirdTask(callback) {
+                setTimeout(() => {
+                    console.log("Third task done");
+                    callback();
+            }, 1000);
+            }
+            // 콜백 헬 형태의 코드
+            firstTask(() => {
+                secondTask(() => {
+                    thirdTask(() => {
+                        console.log("All tasks are done");
+                    });
+                });
+            }); 
+        </script>
+    </body>
+    ```
 
 ### Closure 함수
 ```html
@@ -1544,6 +1661,17 @@ body {
 ## 모듈(export/import)
  - ES6에서 함수 또는 클래스를 파일 단위로 모듈화하여 관리할 수 있는 기능이 추가되었다.
  - export와 import 키워드를 사용해서 파일에 저장된 기능을 내보내기/가져오기를 할 수 있다.
+    ```plainttext
+    -- 파일 내보내기
+    export { 함수이름, 클래스이름, 변수이름 };
+    export default 객체;
+
+    -- 모듈 불러오기
+    import { 함수이름, 클래스이름, 변수이름 } from 경로/파일.js;
+    import 객체 from 경로/파일.js;
+
+    -- 동적으로 모듈 불러오는 방법 : import();
+    ```
  - 코드의 재사용성, 유지보수성을 향상 시키게 되었다.
  - 브라우저의 html 페이지에서 모듈을 사용하려면 script 태그의 type 속성에 module이라고 선언해야 한다.
     - 기본 타입은 type="text/javascript" 이다.
@@ -2017,6 +2145,7 @@ export default function multiply(a, b) {
     - screen : 브라우저별로 화면 속성이 서로 다르기 때문에 운영체제와 관련 screen 속성 제공
     - location : html 페이지 이동, 새로고침등의 기능 제공(href 속성, assign(), reload(), replace, location=location), url관련 정보를 추출
     - history : 브라우저의 user가 방문했었던 페이지 목록 저장 및 이동 메소드를 제공한다. SPA(Single Page Application) 개발 시, 유용하다.
+    - document : HTML의 요소를 검색, 변경 등의 구조를 동적으로 변경한다.
 ```html
 <body>
     이미지 클릭 시, 새창에서 크게 열리도록 구성 <br>
@@ -2147,6 +2276,30 @@ export default function multiply(a, b) {
 
 
 ## JavaScript HTML 객체 모델(DOM, Document Object Model) API
+ - document 객체 특징
+    - html 문서를 추상화하는 객체이다.
+    - DOM tree에서 가장 먼저 생성되는 객체이다.
+    - 요소를 선택하는 메서드
+        - getElementById()
+        - getElementsByTagName()
+        - querySelector()
+        - querySelectorAll()
+    - 요소 생성하는 메서드
+        - createElement()
+            - 만들어진 객체는 아래와 같은 방법들로 추가 가능하다.
+                - parent노드.appendChild()
+                - 형제노드.append()
+    - 요소를 변경하는 메서드
+        - 속성 검색
+            - element.getAttribute("속성")
+        - 속성을 추가
+            - element.속성 = value
+            - element.setAttribute("속성", value)
+        - 속성을 삭제
+            - element.removeAttribute("속성")
+    - 요소를 삭제하는 메서드
+        - parent노드.removeChild("삭제할 노드")
+        - 특정노드.remove()
  - DOM API는 html 문서에 요소 검색, 새로운 요소 추가, 요소 변경, 삭제, 속성 추가 등을 할 수 있다.
     - 즉, 동적으로 문서 구조를 변경할 수 있다.
  - DOM 요소에서 자주 사용하는 주요 속성들
@@ -2689,6 +2842,7 @@ export default function multiply(a, b) {
 
 
 ## Ajax(Asynchronous JavaScript And XML)
+ - 서버에 요청과 응답을 비동기 처리하는 XMLHttpRequest를 활용한다.
  - 기본 환경(BackEnd) 구성 필요 (강의 환경일 뿐이라 꼭 중요하지 않음)
     - Java 17 (jdk-17)
         - JAVA_HOME 환경변수까지 지정
@@ -2701,7 +2855,7 @@ export default function multiply(a, b) {
         - ID : admin / PW : 1234 이면 성공. 그 이외에는 Exception 발생하도록 구성.
     - 정상 실행 완료 시, http://localhost:8080/ 정상 접속 됨.
         - 포트 번호 변경 필요 시, conf 폴더에서 server.xml의 내용 수정하면 됨.
- - 예제1) 로그인 페이지를 만들고 Ajax로 로그인 시도 진행. ID : admin / pw : 1234 가 아닐경우에 Exception 처리 진행.
+ - 예제-1) 로그인 페이지를 만들고 Ajax로 로그인 시도 진행. ID : admin / pw : 1234 가 아닐경우에 Exception 처리 진행.
     - 로그인 요청을 수동으로 TEST 해보고자 하면 JSP 파일을 이용해보면 된다.
         - 주소 : http://localhost:8080/loginProc.jsp?userid=admin&userpwd=1234
         - 요청을 QueryString을 직접 만들어서 진행.
@@ -2807,7 +2961,7 @@ export default function multiply(a, b) {
             xhr.onreadystatechange = resultProcess // 응답을 처리하는 콜백 함수
             xhr.open("GET", url, true) // true = 비동기 여부로 보내도록 지정.
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-            xhr.send(null) // 서버로 요청 전송(open에 요청 내용이 담겼기 때문에 더이상 할게 없어 null 지정)
+            xhr.send(null) // 서버로 요청 전송(send에 매개변수를 넣는 경우는 POST 요청이기 때문에 null 지정)
         }
     }
 
@@ -2838,7 +2992,7 @@ export default function multiply(a, b) {
         }
     }
     ```
- - 예제2) 버튼을 클릭하면 비동기 요청 (GET) imageProc.jsp 에서 이미지 3개를 JSON객체로 응답
+ - 예제-2) 버튼을 클릭하면 비동기 요청 (GET) imageProc.jsp 에서 이미지 3개를 JSON객체로 응답
     - 웹 접속 : http://localhost:8080/image.html
     - 이미지 리스트 목록 확인 : http://localhost:8080/imageProc.jsp
     ```jsp
@@ -2922,12 +3076,214 @@ export default function multiply(a, b) {
     ```
 
 
-## Promise
- - Ajax에서 구성한 Backend 환경 구성 필요.
+## Promise, async/await
+ - Promise는 콜백 함수의 콜백 헬을 해결하기 위해서 기능이 추가되었다.
+ - asnyc/await은 Promise 문법을 간단하게 작성할 수 있도록 만들어졌다.
+    - async는 function 앞에 위치하는데, 해당 함수는 항상 Promise 객체를 반환하도록 의미하게 된다.
+    ```html
+    <body>
+        <script>
+            async function f1() {
+                return 1;
+            }
+            f1().then(alert);
+        </script>
+    </body>
+    ```
+    - await은 Promise가 처리될 때까지(=비동기 함수가 종료될 때까지) 기다린다.
+    - await은 async 함수 안에서만 동작한다.
+    ```html
+    <body>
+        <script>
+            async function f() {
+                let promise = new Promise((resolve, reject) => {
+                setTimeout(() => resolve("완료!"), 1000)
+                });
+            let result = await promise; // 프라미스가 이행될 때까지 기다린 후, 결과값을 result에 저장
+            alert(result); // "완료!"
+            }
+            f();
+        </script>
+    </body>
+    ```
+ - 예제) 비동기 작업으로 file1.txt 읽어서 result.txt 파일 기록 후, file2.txt 읽어서 result.txt에 append, file3.txt 읽어서 result.txt에 append
+    - 코드 실행은 Node.js 활용 ([실행 방법 참고](#기타---nodejs에서-javascript-실행-하기))
+    ```javascript
+    /* async01.js
+     * 일반적인 콜백 함수 사용 (콜백 헬 예제)
+     * 읽고 - 쓰기 - 읽고 - 엎어쓰기 - 읽고 - 엎어쓰기 로 총 6번의 비동기 작업이 이뤄진다. */
+
+    const fs = require('fs');
+
+    fs.readFile('file1.txt', 'utf8', (err, data1) => {
+        if(err) {
+            return console.error("Error reading file1.txt :", err)
+        }
+        fs.writeFile('result.txt', data1, (err)=>{
+            if(err) {
+                return console.error("Error write result.txt :", err)
+            }
+            fs.readFile('file2.txt', 'utf8', (err, data2) => {
+                if(err) {
+                    return console.error("Error reading file2.txt :", err)
+                }
+                fs.appendFile('result.txt', '\n' + data2, (err)=>{
+                    if(err) {
+                        return console.error("Error appending to result.txt :", err)
+                    }
+                    fs.readFile('file3.txt', 'utf8', (err, data3) => {
+                        if(err) {
+                            return console.error("Error reading file3.txt :", err)
+                        }
+                        fs.appendFile('result.txt', '\n' + data3, (err)=>{
+                            if(err) {
+                                return console.error("Error appending to result.txt :", err)
+                            }
+                            console.log('All files have been successfully merged into result.txt')
+                        })
+                    })   
+                })
+            })        
+        })
+    })
+    ```
+    ```javascript
+    /* async02.js
+     * async01.js 를 Promise로 Refactoring */
+
+    const fs = require('fs').promises;
+    // 콜백 기반 비동기 함수가 Promise 객체를 반환해서 Promise의 API를 사용할 수 있도록 해주는 서브 모듈이 추가됨.
+
+    fs.readFile('file1.txt', 'utf8')
+        .then(data1 => {
+            return fs.writeFile('result.txt', data1).then(() => data1)
+        })
+        .then(() => fs.readFile('file2.txt', 'utf8'))
+        .then(data2 => {
+            return fs.appendFile('result.txt', '\n' + data2).then(() => data2)
+        })
+        .then(() => fs.readFile('file3.txt', 'utf8'))
+        .then(data3 => {
+            return fs.appendFile('result.txt', '\n' + data3).then(() => data3)
+        })
+        .then(() => console.log('All files have been successfully merged into result.txt'))
+        .catch(err => console.log('Error:', err))
+    /* 각 then 마다 Promise 객체가 반환되며, 반환될 때마다 상태가 Fullfilled 혹은 Reject의 상태가 반환된다.
+     * 그 상태에 따라 JavaScript 엔진이 다음 then을 실행시킬지? catch를 실행시킬지? 판단한다 */
+    ```
+    ```javascript
+    /* async03.js
+     * async01.js, async02.js 를 async/await 으로 Refactoring */
+
+    const fs = require('fs').promises;
+
+    async function mergeFiles() {
+        try {
+            const data1 = await fs.readFile('file1.txt', 'utf8') // file1.txt를 읽을 때까지 기다렸다가 결과를 data1에 저장.
+            await fs.writeFile('result.txt', data1) // result.txt에 쓸 때까지 기다렸다가 다음 문장 실행.
+
+            const data2 = await fs.readFile('file2.txt', 'utf8')
+            await fs.appendFile('result.txt', '\n' + data2)
+
+            const data3 = await fs.readFile('file3.txt', 'utf8')
+            await fs.appendFile('result.txt', '\n' + data3)
+
+            console.log('All files have been successfully merged into result.txt')
+        } catch (err) {
+            console.error("Error:", err)
+        }
+    }
+    mergeFiles();
+    ```
+
+### Fetch API
+ - XMLHttpRequest 대체로 등장, 비동기 HTTP 요청을 보내기 위한 표준 API
+ - Promise 타입의 객체를 반환한다.
+ - 예제) Ajax에서 구성한 내용을 fetch API로 변경
+    ```javascript
+    /* image.js */
+    window.onload = function() {
+        const btn = document.getElementById("loadImage")
+        btn.onclick = async function() {
+            const container = document.getElementById("image_container")
+            try {
+                const response = await fetch("http://localhost:8080/imageProc.jsp")
+                 // fetch() 함수가 반환한 객체는 Response 객체이다. (그 객체를 response 변수에 저장한 것이다.)
+                if(!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const imageList = await response.json()
+                 // 응답 body를 JSON으로 파싱한다. (비동기 객체로 Promise를 반환한다.)
+                
+                const imageArray = imageList.images;
+                imageArray.forEach(image => {
+                    const img = document.createElement("img")
+                    img.src = image
+                    container.appendChild(img)
+                })
+            } catch(err) {
+                container.textContent = err.message
+            }
+        }
+    }
+    ```
+    ```javascript
+    /* partPage.js */
+    window.onload = function() {
+        const loginBtn = document.getElementById("login")
+        loginBtn.onclick = async function() {
+            let uid = document.getElementById("userid").value
+            let upwd = document.getElementById("userpwd").value
+            let url = "http://localhost:8080/loginProc.jsp?userid=" + uid + "&userpwd=" + upwd
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-type": "application/x-www-form-urlencoded"
+                    }
+                })
+        
+                if(!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+        
+                const text = await response.text()
+                 // XML를 응답받는다.
+                 // Response 객체에는 XML 응답을 파싱하는 메서드가 없으므로 text로 받아서 DOMParser를 이용해서 XML로 변환해야 한다.
+                const parser = new DOMParser()
+                const xmlDoc = parser.parseFromString(text, "application/xml")
+                resultProcess(xmlDoc)
+            } catch(error) {
+                alert("로그인 요청 중 요류 발생: " + error.message)
+            }
+        }
+    }
+
+    function resultProcess(responseXML) {
+        let resultCode = responseXML.getElementsByTagName("result")[0].firstChild.data
+        let name = responseXML.getElementsByTagName("id")[0].firstChild.data
+        if(resultCode == 1) {
+            let str = "<table><tr><td align='center'><b>"+ name + "</b> 님 어서오세요..</td></tr>"
+            str+="<tr><td align='center'><input type='button' id='logout' value='로그아웃' />"
+            str+="</td></tr></table>"
+            document.getElementById("confirmed").innerHTML = str
+        } else if (resultCode == 0) {
+            alert("비밀번호가 맞지 않습니다.\n다시 입력해 주시기 바랍니다.")
+            document.getElementById("userid").value = name
+            document.getElementById("userpwd").value = ""
+            document.getElementById("userpwd").focus()
+        } else {
+            alert("아이디가 맞지 않습니다.\n다시 입력해 주시기 바랍니다.")
+            document.getElementById("userid").value = ""
+            document.getElementById("userpwd").value = ""
+            document.getElementById("userid").focus()
+        }
+    }
+    ```
 
 
-## 기타 - Node.js에서 입/출력 하기
- - node.js에서는 만들어진 JavaScript 파일을 읽어 입/출력을 진행한다.
+## 기타 - Node.js에서 JavaScript 실행 하기
+ - node.js에서는 만들어진 JavaScript 파일을 읽어 코드 실행을 진행한다.
     ```javascript
     const readline = require('readline');
 
@@ -2967,3 +3323,5 @@ export default function multiply(a, b) {
     - Prettier : 소스 코드 색상 구분
     - Korean Language Pack : vscode 한글화
     - vscode-pdf : vscode에 pdf reader 설치
+
+
